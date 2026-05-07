@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Confession - Envoyez votre message secret</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Bot Confession</h1>
+            <p>Envoyez un message anonyme et secret</p>
+        </div>
+        
+        <div class="confession-form">
+            <form id="confessionForm">
+                <div class="form-group">
+                    <label for="message">Votre message secret :</label>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        rows="6" 
+                        placeholder="Écrivez votre confession ici..."
+                        required
+                        maxlength="1000"
+                    ></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/1000 caractères
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Envoyer la confession</span>
+                    <span class="btn-loader" style="display: none;">Envoi en cours...</span>
+                </button>
+            </form>
+        </div>
+        
+        <div id="result" class="result" style="display: none;">
+            <div class="success">
+                <h3>✅ Confession envoyée avec succès !</h3>
+                <p>ID de votre confession : <span id="confessionId"></span></p>
+                <p class="note">Votre message sera affiché sur le Discord et vous recevrez une réponse bientôt.</p>
+            </div>
+        </div>
+        
+        <div id="error" class="result error" style="display: none;">
+            <h3>❌ Erreur</h3>
+            <p id="errorMessage"></p>
+        </div>
+        
+        <div class="info">
+            <h3>ℹ️ Comment ça marche ?</h3>
+            <ul>
+                <li>Écrivez votre message secret dans le formulaire</li>
+                <li>Cliquez sur "Envoyer la confession"</li>
+                <li>Le bot affichera votre message sur le Discord</li>
+                <li>Vous recevrez une réponse générée par le bot</li>
+                <li>Tout reste anonyme !</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

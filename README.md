@@ -6,46 +6,67 @@ Un bot Discord de confession avec interface web permettant aux utilisateurs d'en
 
 - **Interface web intuitive** : Les utilisateurs peuvent envoyer des confessions via un site web
 - **Anonymat total** : Les messages sont envoyés de manière anonyme
-- **Intégration Discord** : Les confessions sont automatiquement postées dans le salon Discord spécifié
-- **Système de réponse** : Les modérateurs peuvent répondre aux confessions via Discord
+- **Intégration Discord** : Les confessions sont automatiquement postées via Webhook
 - **Interface moderne** : Design responsive et élégant
+- **Déploiement Vercel** : Prêt pour le déploiement serverless
 
-## 🚀 Installation
+## 🚀 Déploiement sur Vercel
 
-### Prérequis
+### Étape 1 : Obtenir un Webhook Discord
 
-- Node.js (v14 ou supérieur)
-- npm ou yarn
-- Un token de bot Discord
+1. Allez dans votre serveur Discord
+2. Cliquez sur les paramètres du salon où vous voulez recevoir les confessions
+3. Allez dans "Intégrations" → "Webhooks"
+4. Cliquez sur "Créer un Webhook"
+5. Copiez l'URL du webhook
 
-### Étapes d'installation
+### Étape 2 : Déployer sur Vercel
 
-1. **Cloner ou télécharger le projet**
+1. **Pusher votre code sur GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/votre-username/bot-confession.git
+   git push -u origin main
+   ```
 
-2. **Installer les dépendances**
+2. **Importer sur Vercel**
+   - Allez sur [vercel.com](https://vercel.com)
+   - Cliquez sur "Add New Project"
+   - Importez votre repository GitHub
+   - Cliquez sur "Deploy"
+
+3. **Configurer les variables d'environnement**
+   - Dans les paramètres du projet Vercel
+   - Allez dans "Settings" → "Environment Variables"
+   - Ajoutez :
+     - Nom : `DISCORD_WEBHOOK_URL`
+     - Valeur : votre URL de webhook Discord
+   - Redéployez le projet
+
+4. **Accéder à votre site**
+   - Vercel vous fournira une URL comme `https://bot-confession.vercel.app`
+   - Partagez cette URL avec vos utilisateurs
+
+### Alternative : Déploiement local
+
+Si vous préférez exécuter localement :
+
+1. **Installer les dépendances**
    ```bash
    npm install
    ```
 
-3. **Configurer les variables d'environnement**
+2. **Configurer les variables d'environnement**
    
    Créez un fichier `.env` à la racine du projet et ajoutez :
    ```env
-   DISCORD_TOKEN=votre_token_discord_ici
-   PORT=3000
+   DISCORD_WEBHOOK_URL=votre_url_webhook_discord_ici
    ```
 
-   Pour obtenir votre token Discord :
-   - Allez sur le [Discord Developer Portal](https://discord.com/developers/applications)
-   - Créez une application
-   - Allez dans l'onglet "Bot" et créez un bot
-   - Copiez le token du bot
-   - Activez les intents suivants :
-     - Server Members Intent
-     - Message Content Intent
-   - Invitez le bot sur votre serveur avec les permissions nécessaires
-
-4. **Démarrer le serveur**
+3. **Démarrer le serveur**
    ```bash
    npm start
    ```
@@ -56,45 +77,24 @@ Un bot Discord de confession avec interface web permettant aux utilisateurs d'en
 
 ### Pour les utilisateurs
 
-1. Accédez à l'interface web : `http://localhost:3000`
+1. Accédez à l'interface web (URL Vercel ou localhost)
 2. Écrivez votre message secret dans le formulaire
 3. Cliquez sur "Envoyer la confession"
 4. Votre message sera posté sur le Discord de manière anonyme
-5. Vous recevrez un ID de confession pour suivre votre message
+5. Vous recevrez un ID de confirmation
 
 ### Pour les modérateurs (Discord)
 
-Pour répondre à une confession, utilisez la commande :
-```
-!repondre <id_confession> <votre_réponse>
-```
-
-Exemple :
-```
-!repondre 1234567890 Merci pour votre confession, nous apprécions votre partage.
-```
+Les confessions apparaîtront directement dans le salon configuré avec le webhook. Les modérateurs peuvent répondre manuellement dans le salon Discord.
 
 ## 🛠️ Configuration
 
-### Changer le salon Discord
+### Changer le Webhook Discord
 
-Par défaut, le bot poste dans le salon avec l'ID `1502031882487988236`. Pour le changer :
-
-1. Ouvrez `server.js`
-2. Modifiez la ligne :
-   ```javascript
-   const DISCORD_CHANNEL_ID = '1502031882487988236';
-   ```
-3. Remplacez par l'ID de votre salon
-
-### Changer le port
-
-Par défaut, le serveur utilise le port 3000. Pour le changer :
-
-1. Modifiez le fichier `.env` :
-   ```env
-   PORT=votre_port
-   ```
+Pour utiliser un autre webhook :
+- Modifiez la variable d'environnement `DISCORD_WEBHOOK_URL`
+- Sur Vercel : Settings → Environment Variables
+- En local : Modifiez le fichier `.env`
 
 ## 📁 Structure du projet
 
@@ -104,7 +104,9 @@ Bot confession/
 │   ├── index.html      # Interface web principale
 │   ├── style.css       # Styles CSS
 │   └── script.js       # JavaScript frontend
-├── server.js           # Serveur backend + Bot Discord
+├── api/
+│   └── confession.js   # API serverless Vercel
+├── vercel.json         # Configuration Vercel
 ├── package.json        # Dépendances Node.js
 ├── .env.example        # Exemple de variables d'environnement
 └── README.md           # Documentation
@@ -112,29 +114,23 @@ Bot confession/
 
 ## 🔒 Sécurité
 
-- Ne partagez jamais votre token Discord
+- Ne partagez jamais votre URL de webhook Discord
 - Les confessions sont stockées en mémoire uniquement (non persistantes)
-- Utilisez HTTPS en production pour sécuriser les communications
+- Vercel utilise HTTPS automatiquement
 
 ## 🐛 Dépannage
 
-### Le bot ne se connecte pas à Discord
-
-- Vérifiez que votre token est correct dans le fichier `.env`
-- Assurez-vous que les intents nécessaires sont activés sur le Discord Developer Portal
-- Vérifiez que le bot a les permissions nécessaires sur le serveur
-
-### L'interface web ne fonctionne pas
-
-- Vérifiez que le serveur est bien démarré
-- Assurez-vous que le port spécifié n'est pas déjà utilisé
-- Vérifiez les logs du serveur pour les erreurs
-
 ### Les messages ne s'affichent pas sur Discord
 
-- Vérifiez que l'ID du salon est correct
-- Assurez-vous que le bot a la permission d'écrire dans le salon
-- Vérifiez que le bot est bien présent sur le serveur
+- Vérifiez que l'URL du webhook est correcte
+- Assurez-vous que le webhook a la permission d'écrire dans le salon
+- Vérifiez les logs Vercel pour les erreurs
+
+### Erreur sur l'interface web
+
+- Vérifiez que la variable d'environnement est configurée
+- Regardez les logs dans le tableau de bord Vercel
+- Assurez-vous que le webhook Discord est actif
 
 ## 📝 Licence
 
