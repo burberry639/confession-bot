@@ -141,3 +141,4 @@ Ce projet est fourni tel quel pour un usage personnel.
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou un pull request.
 "# confession-shinjukai" 
 "# confession-shinjukai" 
+"# confession-shinjukai" 
