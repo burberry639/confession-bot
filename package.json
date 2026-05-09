@@ -1,5 +1,7 @@
 {
   "name": "confession-bot",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
 }
