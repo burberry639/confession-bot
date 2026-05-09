@@ -3,39 +3,32 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 // Store pending responses (in production, use a database)
 const pendingResponses = new Map();
 
-export default async function handler(request) {
+module.exports = async function handler(req, res) {
   try {
     // Enable CORS
-    const corsHeaders = {
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-      'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-    };
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
 
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        status: 200,
-        headers: corsHeaders
-      });
+    if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
     }
 
-    if (request.method === 'POST') {
-      const { message } = await request.json();
+    if (req.method === 'POST') {
+      const { message } = req.body;
       
       if (!message || message.trim() === '') {
-        return new Response(
-          JSON.stringify({ error: 'Message cannot be empty' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return res.status(400).json({ error: 'Message cannot be empty' });
       }
 
       if (!DISCORD_WEBHOOK_URL) {
         console.error('DISCORD_WEBHOOK_URL not set');
-        return new Response(
-          JSON.stringify({ error: 'Discord webhook URL not configured in environment variables' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return res.status(500).json({ error: 'Discord webhook URL not configured in environment variables' });
       }
 
       const confessionId = Date.now().toString();
@@ -64,55 +57,36 @@ export default async function handler(request) {
         responded: false
       });
 
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          confessionId,
-          message: 'Confession sent successfully'
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } else if (request.method === 'GET') {
-      const url = new URL(request.url);
-      const id = url.searchParams.get('id');
+      res.json({ 
+        success: true, 
+        confessionId,
+        message: 'Confession sent successfully'
+      });
+    } else if (req.method === 'GET') {
+      const { id } = req.query;
       
       if (!id) {
-        return new Response(
-          JSON.stringify({ error: 'Confession ID required' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return res.status(400).json({ error: 'Confession ID required' });
       }
 
       const confession = pendingResponses.get(id);
       
       if (!confession) {
-        return new Response(
-          JSON.stringify({ error: 'Confession not found' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return res.status(404).json({ error: 'Confession not found' });
       }
 
-      return new Response(
-        JSON.stringify({
-          id,
-          message: confession.message,
-          timestamp: confession.timestamp,
-          responded: confession.responded,
-          response: confession.response || null
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      res.json({
+        id,
+        message: confession.message,
+        timestamp: confession.timestamp,
+        responded: confession.responded,
+        response: confession.response || null
+      });
     } else {
-      return new Response(
-        JSON.stringify({ error: 'Method not allowed' }),
-        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
     console.error('API Error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
