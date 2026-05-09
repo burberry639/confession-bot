@@ -3,7 +3,7 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 // Store pending responses (in production, use a database)
 const pendingResponses = new Map();
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   try {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
