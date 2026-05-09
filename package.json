@@ -2,6 +2,7 @@
   "name": "confession-bot",
   "version": "1.0.0",
   "description": "Discord confession bot with web interface",
+  "main": "index.js",
   "scripts": {
     "start": "node server.local.js",
     "dev": "node server.local.js"
